@@ -13,7 +13,6 @@ public class MainController : MonoBehaviour {
 
     private Dictionary<string, GameObject> Objects;
 
-	// Use this for initialization
 	void Start () {
         Objects = new Dictionary<string, GameObject>();
 
@@ -47,116 +46,92 @@ public class MainController : MonoBehaviour {
         }
     }
 
-	// Update is called once per frame
+    private void SetDirectionToEnemyBase(GameObject obj)
+    {
+        SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
+
+        switch (obj.GetComponent<Crystal>().Owner)
+        {
+            case Crystal.Player.LeftPlayer:
+                spriteRenderer.flipX = false;
+                break;
+            case Crystal.Player.RightPlayer:
+                spriteRenderer.flipX = true;
+                break;
+        }
+    }
+
 	void Update () {
-        while (Pointer < Commands.Length && float.Parse(Commands[Pointer].Split(' ')[0]) < GloablTime)
+        while (Pointer < Commands.Length && float.Parse(Commands[Pointer].Split(' ')[1]) < GloablTime)
         {
             string[] command = Commands[Pointer].Split(' ');
             Pointer++;
+            Debug.Log(command[0]);
 
-            Debug.Log(command[1]);
+            GameObject obj = null;
+            string id = command[2];
+            float position = float.Parse(command[3]);
 
-            if (command[1] == "DECLARE")
+            if (command[0] == "CREATE")
             {
-                // Parameters
-                string id = command[2];
-                string name = command[3];
-                Crystal.Player owner = (Crystal.Player) Enum.Parse(typeof(Crystal.Player), command[4]);
+                // Additional params
+                string name = command[4];
+                Crystal.Player owner = (Crystal.Player)Enum.Parse(typeof(Crystal.Player), command[5]);
 
                 // Create object
-                GameObject obj = (GameObject) Instantiate(Resources.Load(name));
+                obj = (GameObject)Instantiate(Resources.Load(name));
                 Objects.Add(id, obj);
 
                 // Set owner
                 obj.GetComponent<Crystal>().Owner = owner;
 
                 // Initial direction to enemy base
-                SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
-
-                switch (obj.GetComponent<Crystal>().Owner)
-                {
-                    case Crystal.Player.LeftPlayer:
-                        spriteRenderer.flipX = false;
-                        break;
-                    case Crystal.Player.RightPlayer:
-                        spriteRenderer.flipX = true;
-                        break;
-                }
+                SetDirectionToEnemyBase(obj);
+            }
+            else
+            {
+                obj = Objects[id];
             }
 
-            if (command[1] == "DEPLOY")
+            SetPosition(obj, position);
+
+            if (command[0] == "DEPLOY")
             {
-                // Parameters
-                string id = command[2];
-                float position = float.Parse(command[3]);
-
-                // Find object
-                GameObject obj = Objects[id];
-
-                SetPosition(obj, position);
-                SetAnimation(obj, "Die");
                 SetMotionTarget(obj, null);
+                SetAnimation(obj, "Idle");  // Todo
             }
 
-            if (command[1] == "IDLE")
+            if (command[0] == "IDLE")
             {
-                string id = command[2];
-                float position = float.Parse(command[3]);
-
-                GameObject obj = Objects[id];
-
-                SetPosition(obj, position);
+                SetMotionTarget(obj, null);
                 SetAnimation(obj, "Idle");
-                SetMotionTarget(obj, null);
             }
 
-            if (command[1] == "WALK")
+            if (command[0] == "WALK")
             {
-                string id = command[2];
-                float position = float.Parse(command[3]);
                 string targetId = command[4];
 
-                GameObject obj = Objects[id];
-
-                SetPosition(obj, position);
                 SetAnimation(obj, "Walk");
                 SetMotionTarget(obj, Objects[targetId]);
             }
 
-            if (command[1] == "SHOT")
+            if (command[0] == "ATTACK")
             {
-                string id = command[2];
-                float position = float.Parse(command[3]);
                 string targetId = command[4];
 
-                GameObject obj = Objects[id];
-
-                SetPosition(obj, position);
-                SetAnimation(obj, "Attack");
                 SetMotionTarget(obj, null);
-
-                // todo
+                SetAnimation(obj, "Attack");    // Todo
             }
 
-            if (command[1] == "HEALTH")
+            if (command[0] == "HEALTH")
             {
-                string id = command[2];
-//                float position = float.Parse(command[3]);
-                int health = int.Parse(command[3]);
+                int health = int.Parse(command[4]);
 
-                GameObject obj = Objects[id];
-
-//                SetPosition(obj, position);
                 obj.GetComponent<Health>().CurrentHealth = health;
             }
 
-            if (command[1] == "DEATH")
+            if (command[0] == "DEATH")
             {
-                string id = command[2];
-
-                GameObject obj = Objects[id];
-
-//                SetPosition
                 SetMotionTarget(obj, null);
                 SetAnimation(obj, "Die");
                 StartCoroutine(DeleteCoro(obj, 4));
