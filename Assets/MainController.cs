@@ -21,6 +21,18 @@ public class MainController : MonoBehaviour {
         GloablTime = 0;
 	}
 
+    private T GetOrAddComponent<T>(GameObject obj) where T : Component
+    {
+        T component = obj.GetComponent<T>();
+
+        if (component == null)
+        {
+            component = obj.AddComponent<T>();
+        }
+
+        return component;
+    }
+
     private void SetPosition(GameObject obj, float position)
     {
         Vector3 pos = obj.transform.position;
@@ -34,19 +46,20 @@ public class MainController : MonoBehaviour {
         obj.GetComponent<Animator>().Play(animationFullName, 0, 0);
     }
 
-    private void SetMotionTarget(GameObject obj, GameObject target)
+    private void SetMotion(GameObject obj, GameObject target, float speed)
     {
-        if (obj.GetComponent<Mover>() != null)
-        {
-            obj.GetComponent<Mover>().Target = target;
-        }
-        else
-        {
-            Debug.Log("Object hasn't mover component");
-        }
+        Mover mover = GetOrAddComponent<Mover>(obj);
+
+        mover.Target = target;
+        mover.Speed = speed;
     }
 
-    private void SetDirectionToEnemyBase(GameObject obj)
+    private void StopMotion(GameObject obj)
+    {
+        GameObject.Destroy(obj.GetComponent<Mover>());
+    }
+
+    private void SetDefaultDirection(GameObject obj)
     {
         SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
 
@@ -59,6 +72,22 @@ public class MainController : MonoBehaviour {
                 spriteRenderer.flipX = true;
                 break;
         }
+    }
+
+    private void SetHealth(GameObject obj, int currentHealth, int maxHealth)
+    {
+        Health health = GetOrAddComponent<Health>(obj);
+
+        health.MaxHealth = maxHealth;
+        health.CurrentHealth = currentHealth;
+    }
+
+    private void SetCrystal(GameObject obj, string name, Crystal.Player owner)
+    {
+        Crystal crystal = GetOrAddComponent<Crystal>(obj);
+
+        crystal.Name = name;
+        crystal.Owner = owner;
     }
 
 	void Update () {
@@ -82,11 +111,8 @@ public class MainController : MonoBehaviour {
                 obj = (GameObject)Instantiate(Resources.Load(name));
                 Objects.Add(id, obj);
 
-                // Set owner
-                obj.GetComponent<Crystal>().Owner = owner;
-
-                // Initial direction to enemy base
-                SetDirectionToEnemyBase(obj);
+                SetCrystal(obj, name, owner);
+                SetDefaultDirection(obj);
             }
             else
             {
@@ -97,42 +123,44 @@ public class MainController : MonoBehaviour {
 
             if (command[0] == "DEPLOY")
             {
-                SetMotionTarget(obj, null);
+                StopMotion(obj);
                 SetAnimation(obj, "Idle");  // Todo
             }
 
             if (command[0] == "IDLE")
             {
-                SetMotionTarget(obj, null);
+                StopMotion(obj);
                 SetAnimation(obj, "Idle");
             }
 
             if (command[0] == "WALK")
             {
                 string targetId = command[4];
+                float speed = float.Parse(command[5]);
 
                 SetAnimation(obj, "Walk");
-                SetMotionTarget(obj, Objects[targetId]);
+                SetMotion(obj, Objects[targetId], speed);
             }
 
             if (command[0] == "ATTACK")
             {
                 string targetId = command[4];
 
-                SetMotionTarget(obj, null);
+                StopMotion(obj);
                 SetAnimation(obj, "Attack");    // Todo
             }
 
             if (command[0] == "HEALTH")
             {
-                int health = int.Parse(command[4]);
+                int currentHealth = int.Parse(command[4]);
+                int maxHealth = int.Parse(command[4]);
 
-                obj.GetComponent<Health>().CurrentHealth = health;
+                SetHealth(obj, currentHealth, maxHealth);
             }
 
             if (command[0] == "DEATH")
             {
-                SetMotionTarget(obj, null);
+                StopMotion(obj);
                 SetAnimation(obj, "Die");
                 StartCoroutine(DeleteCoro(obj, 4));
             }
