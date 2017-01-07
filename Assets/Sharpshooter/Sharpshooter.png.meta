@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 180f9b95f24f34d27a2713643e172d31
-timeCreated: 1483789081
+timeCreated: 1483817745
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -25,15 +25,16 @@ TextureImporter:
     21300036: Sharpshooter_0
     21300038: Sharpshooter_1
     21300040: Sharpshooter_2
-    21300042: Sharpshooter_3
-    21300044: Sharpshooter_4
-    21300046: Sharpshooter_5
-    21300048: Sharpshooter_6
-    21300050: Sharpshooter_7
-    21300052: Sharpshooter_8
-    21300054: Sharpshooter_9
-    21300056: Sharpshooter_10
+    21300042: w0
+    21300044: w1
+    21300046: w2
+    21300048: w3
+    21300050: w4
+    21300052: w5
+    21300054: w6
+    21300056: w7
     21300058: Sharpshooter_11
+    21300060: arrow
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -317,46 +318,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Sharpshooter_0
-      rect:
-        serializedVersion: 2
-        x: 17
-        y: 122
-        width: 39
-        height: 82
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: Sharpshooter_1
-      rect:
-        serializedVersion: 2
-        x: 67
-        y: 123
-        width: 60
-        height: 77
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: Sharpshooter_2
-      rect:
-        serializedVersion: 2
-        x: 134
-        y: 122
-        width: 69
-        height: 78
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: Sharpshooter_3
+      name: w0
       rect:
         serializedVersion: 2
         x: 209
@@ -369,7 +331,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Sharpshooter_4
+      name: w1
       rect:
         serializedVersion: 2
         x: 279
@@ -382,7 +344,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Sharpshooter_5
+      name: w2
       rect:
         serializedVersion: 2
         x: 353
@@ -395,7 +357,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Sharpshooter_6
+      name: w3
       rect:
         serializedVersion: 2
         x: 425
@@ -408,7 +370,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Sharpshooter_7
+      name: w4
       rect:
         serializedVersion: 2
         x: 494
@@ -421,7 +383,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Sharpshooter_8
+      name: w5
       rect:
         serializedVersion: 2
         x: 565
@@ -434,7 +396,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Sharpshooter_9
+      name: w6
       rect:
         serializedVersion: 2
         x: 640
@@ -447,7 +409,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Sharpshooter_10
+      name: w7
       rect:
         serializedVersion: 2
         x: 723
@@ -460,13 +422,13 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Sharpshooter_11
+      name: arrow
       rect:
         serializedVersion: 2
-        x: 803
-        y: 123
-        width: 45
-        height: 77
+        x: 199
+        y: 513
+        width: 30
+        height: 63
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

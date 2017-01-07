@@ -16,7 +16,20 @@ public class Mover : MonoBehaviour {
 	void Update () {
         if (Target != null)
         {
-            transform.Translate((Target.transform.position - transform.position).normalized * Speed * Time.deltaTime);
+            Vector3 newPosition =  transform.position;
+
+            float d = Target.transform.position.x - transform.position.x;
+
+            if (d == 0)
+            {
+                return;
+            }
+
+            newPosition.x = newPosition.x + d / Mathf.Abs(d) * Speed * Time.deltaTime;
+
+            transform.position = newPosition;
+
+//            transform.Translate((Target.transform.position - transform.position).normalized * Speed * Time.deltaTime);
         }
 	}
 }

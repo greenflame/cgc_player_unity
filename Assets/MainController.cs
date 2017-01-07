@@ -153,7 +153,7 @@ public class MainController : MonoBehaviour {
             if (command[0] == "HEALTH")
             {
                 int currentHealth = int.Parse(command[4]);
-                int maxHealth = int.Parse(command[4]);
+                int maxHealth = int.Parse(command[5]);
 
                 SetHealth(obj, currentHealth, maxHealth);
             }
@@ -163,6 +163,19 @@ public class MainController : MonoBehaviour {
                 StopMotion(obj);
                 SetAnimation(obj, "Die");
                 StartCoroutine(DeleteCoro(obj, 4));
+            }
+
+            if (command[0] == "ARROW_FLIGHT")
+            {
+                string targetId = command[4];
+                float speed = float.Parse(command[5]);
+
+                SetMotion(obj, Objects[targetId], speed);
+            }
+
+            if (command[0] == "DESTROY")
+            {
+                GameObject.Destroy(Objects[id]);
             }
         }
 
