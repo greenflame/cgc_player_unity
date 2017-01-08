@@ -6,6 +6,8 @@ public class Mover : MonoBehaviour {
 
     public float Speed;
     public GameObject Target;
+    public float PosTarget;
+    public bool PosTargetEnable = false;
 
 	// Use this for initialization
 	void Start () {
@@ -14,11 +16,16 @@ public class Mover : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Target != null)
+        if (!PosTargetEnable && Target == null)
         {
-            Vector3 newPosition =  transform.position;
+            return;
+        }
+        else
+        {
+            Vector3 newPosition = transform.position;
+            float targetPos = PosTargetEnable ? PosTarget : Target.transform.position.x;
 
-            float d = Target.transform.position.x - transform.position.x;
+            float d = targetPos - transform.position.x;
 
             if (d == 0)
             {

@@ -54,6 +54,15 @@ public class MainController : MonoBehaviour {
         mover.Speed = speed;
     }
 
+    private void SetPositionMotion(GameObject obj, float target, float speed)
+    {
+        Mover mover = GetOrAddComponent<Mover>(obj);
+
+        mover.PosTarget = target;
+        mover.PosTargetEnable = true;
+        mover.Speed = speed;
+    }
+
     private void StopMotion(GameObject obj)
     {
         GameObject.Destroy(obj.GetComponent<Mover>());
@@ -171,6 +180,14 @@ public class MainController : MonoBehaviour {
                 float speed = float.Parse(command[5]);
 
                 SetMotion(obj, Objects[targetId], speed);
+            }
+
+            if (command[0] == "BOMB_FLIGHT")
+            {
+                float targetPos = float.Parse(command[4]);
+                float speed = float.Parse(command[5]);
+
+                SetPositionMotion(obj, targetPos, speed);
             }
 
             if (command[0] == "DESTROY")

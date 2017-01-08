@@ -6,9 +6,13 @@ public class Health : MonoBehaviour {
     public int MaxHealth;
     public int CurrentHealth;
 
+    private float labelDelta;
+
 	// Use this for initialization
 	void Start () {
         CurrentHealth = MaxHealth;
+        Random.seed += 1;
+        labelDelta = Random.Range(1, 3);
 	}
 	
 	// Update is called once per frame
@@ -17,7 +21,7 @@ public class Health : MonoBehaviour {
 	}
 
     void OnGUI() {
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position + Vector3.up);
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position + Vector3.up * labelDelta);
         screenPos.y = Screen.height - screenPos.y;
 
         GUIStyle style = new GUIStyle();
