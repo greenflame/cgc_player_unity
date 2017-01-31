@@ -74,10 +74,10 @@ public class MainController : MonoBehaviour {
 
         switch (obj.GetComponent<Crystal>().Owner)
         {
-            case Crystal.Player.LeftPlayer:
+            case Crystal.Player.Left:
                 spriteRenderer.flipX = false;
                 break;
-            case Crystal.Player.RightPlayer:
+            case Crystal.Player.Right:
                 spriteRenderer.flipX = true;
                 break;
         }

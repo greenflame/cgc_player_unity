@@ -5,8 +5,8 @@ public class Crystal : MonoBehaviour {
 
     public enum Player
     {
-        LeftPlayer,
-        RightPlayer
+        Left,
+        Right
     }
 
     public string Name;
