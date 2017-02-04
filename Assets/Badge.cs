@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Crystal : MonoBehaviour {
+public class Badge : MonoBehaviour {
 
     public enum Player
     {

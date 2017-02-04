@@ -5,203 +5,193 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
-public class MainController : MonoBehaviour {
+public class MainController : MonoBehaviour
+{
 
-    public float GloablTime;
-    private string[] Commands;
-    private int Pointer;
+	public float GloablTime;
+	private string[] Commands;
+	private int Pointer;
 
-    private Dictionary<string, GameObject> Objects;
+	private Dictionary<string, GameObject> Objects;
 
-	void Start () {
-        Objects = new Dictionary<string, GameObject>();
+	void Start()
+	{
+		Objects = new Dictionary<string, GameObject>();
 
-        Commands = File.ReadAllLines("/Users/Alexander/Desktop/log1");
-        Pointer = 0;
-        GloablTime = 0;
+		Commands = File.ReadAllLines("/Users/alexander/cgc_compiler/cgc_compiler/bin/Debug/game_log.txt");
+		Pointer = 0;
+		GloablTime = 0;
 	}
 
-    private T GetOrAddComponent<T>(GameObject obj) where T : Component
-    {
-        T component = obj.GetComponent<T>();
-
-        if (component == null)
-        {
-            component = obj.AddComponent<T>();
-        }
-
-        return component;
-    }
-
-    private void SetPosition(GameObject obj, float position)
-    {
-        Vector3 pos = obj.transform.position;
-        pos.x = position;
-        obj.transform.position = pos;
-    }
-
-    private void SetAnimation(GameObject obj, string animationName)
-    {
-        string animationFullName = obj.GetComponent<Crystal>().Name + animationName;
-        obj.GetComponent<Animator>().Play(animationFullName, 0, 0);
-    }
-
-    private void SetMotion(GameObject obj, GameObject target, float speed)
-    {
-        Mover mover = GetOrAddComponent<Mover>(obj);
-
-        mover.Target = target;
-        mover.Speed = speed;
-    }
-
-    private void SetPositionMotion(GameObject obj, float target, float speed)
-    {
-        Mover mover = GetOrAddComponent<Mover>(obj);
-
-        mover.PosTarget = target;
-        mover.PosTargetEnable = true;
-        mover.Speed = speed;
-    }
-
-    private void StopMotion(GameObject obj)
-    {
-        GameObject.Destroy(obj.GetComponent<Mover>());
-    }
-
-    private void SetDefaultDirection(GameObject obj)
-    {
-        SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
-
-        switch (obj.GetComponent<Crystal>().Owner)
-        {
-            case Crystal.Player.Left:
-                spriteRenderer.flipX = false;
-                break;
-            case Crystal.Player.Right:
-                spriteRenderer.flipX = true;
-                break;
-        }
-    }
-
-    private void SetHealth(GameObject obj, int currentHealth, int maxHealth)
-    {
-        Health health = GetOrAddComponent<Health>(obj);
-
-        health.MaxHealth = maxHealth;
-        health.CurrentHealth = currentHealth;
-    }
-
-    private void SetCrystal(GameObject obj, string name, Crystal.Player owner)
-    {
-        Crystal crystal = GetOrAddComponent<Crystal>(obj);
-
-        crystal.Name = name;
-        crystal.Owner = owner;
-    }
-
-	void Update () {
-        while (Pointer < Commands.Length && float.Parse(Commands[Pointer].Split(' ')[1]) < GloablTime)
-        {
-            string[] command = Commands[Pointer].Split(' ');
-            Pointer++;
-            Debug.Log(command[0]);
-
-            GameObject obj = null;
-            string id = command[2];
-            float position = float.Parse(command[3]);
-
-            if (command[0] == "CREATE")
-            {
-                // Additional params
-                string name = command[4];
-                Crystal.Player owner = (Crystal.Player)Enum.Parse(typeof(Crystal.Player), command[5]);
-
-                // Create object
-                obj = (GameObject)Instantiate(Resources.Load(name));
-                Objects.Add(id, obj);
-
-                SetCrystal(obj, name, owner);
-                SetDefaultDirection(obj);
-            }
-            else
-            {
-                obj = Objects[id];
-            }
-
-            SetPosition(obj, position);
-
-            if (command[0] == "DEPLOY")
-            {
-                StopMotion(obj);
-                SetAnimation(obj, "Idle");  // Todo
-            }
-
-            if (command[0] == "IDLE")
-            {
-                StopMotion(obj);
-                SetAnimation(obj, "Idle");
-            }
-
-            if (command[0] == "WALK")
-            {
-                string targetId = command[4];
-                float speed = float.Parse(command[5]);
-
-                SetAnimation(obj, "Walk");
-                SetMotion(obj, Objects[targetId], speed);
-            }
-
-            if (command[0] == "ATTACK")
-            {
-                string targetId = command[4];
-
-                StopMotion(obj);
-                SetAnimation(obj, "Attack");    // Todo
-            }
-
-            if (command[0] == "HEALTH")
-            {
-                int currentHealth = int.Parse(command[4]);
-                int maxHealth = int.Parse(command[5]);
-
-                SetHealth(obj, currentHealth, maxHealth);
-            }
-
-            if (command[0] == "DEATH")
-            {
-                StopMotion(obj);
-                SetAnimation(obj, "Die");
-                StartCoroutine(DeleteCoro(obj, 4));
-            }
-
-            if (command[0] == "ARROW_FLIGHT")
-            {
-                string targetId = command[4];
-                float speed = float.Parse(command[5]);
-
-                SetMotion(obj, Objects[targetId], speed);
-            }
-
-            if (command[0] == "BOMB_FLIGHT")
-            {
-                float targetPos = float.Parse(command[4]);
-                float speed = float.Parse(command[5]);
-
-                SetPositionMotion(obj, targetPos, speed);
-            }
-
-            if (command[0] == "DESTROY")
-            {
-                GameObject.Destroy(Objects[id]);
-            }
-        }
-
-        GloablTime += Time.deltaTime;
+	private IEnumerator DeleteCoro(GameObject target, float time)
+	{
+		yield return new WaitForSeconds(time);
+		GameObject.Destroy(target);
 	}
 
-    private IEnumerator DeleteCoro(GameObject target, float time)
-    {
-        yield return new WaitForSeconds(time);
-        GameObject.Destroy(target);
-    }
+	private T GetOrAddComponent<T>(GameObject obj) where T : Component
+	{
+		T component = obj.GetComponent<T>();
+
+		if (component == null)
+		{
+			component = obj.AddComponent<T>();
+		}
+
+		return component;
+	}
+		
+	private void SetAnimation(GameObject obj, string animationName)
+	{
+		string animationFullName = obj.GetComponent<Badge>().Name + animationName;
+		obj.GetComponent<Animator>().Play(animationFullName, 0, 0);
+	}
+		
+	void Update()
+	{
+		while (Pointer < Commands.Length && float.Parse(Commands[Pointer].Split(' ')[1]) < GloablTime)
+		{
+			string[] args = Commands[Pointer].Split(' ');
+			Debug.Log(Commands[Pointer]);
+			Pointer++;
+
+			string action = args[0];
+			string id = args[2];
+
+			args = args.Skip(3).ToArray();
+
+			if (action == "CREATE")
+			{
+				string name = args[0];
+				Badge.Player owner = (Badge.Player)Enum.Parse(typeof(Badge.Player), args[1]);
+
+				GameObject tmp = (GameObject)Instantiate(Resources.Load(name));
+				Objects.Add(id, tmp);
+
+				Badge crystal = GetOrAddComponent<Badge>(tmp);
+
+				crystal.Name = name;
+				crystal.Owner = owner;
+			}
+
+			GameObject obj = Objects[id];
+
+			if (action == "DESTROY")
+			{
+				StartCoroutine(DeleteCoro(obj, 0));
+			}
+
+			if (action == "DESTROY_DELAYED")
+			{
+				float interval = float.Parse(args[0]);
+
+				StartCoroutine(DeleteCoro(obj, interval));
+			}
+
+			if (action == "SET_HEALTH")
+			{
+				int currentHealth = (int)Math.Round(float.Parse(args[0]));
+				int maxHealth = (int)Math.Round(float.Parse(args[1]));
+
+				Health health = GetOrAddComponent<Health>(obj);
+
+				health.MaxHealth = maxHealth;
+				health.CurrentHealth = currentHealth;
+			}
+
+			if (action == "SET_POSITION")
+			{
+				float pos = float.Parse(args[0]);
+
+				Vector3 tmp = obj.transform.position;
+				tmp.x = pos;
+				obj.transform.position = tmp;
+			}
+				
+			if (action == "SET_DIRECTION_TARGET")
+			{
+				GameObject target = Objects[args[0]];
+
+				SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
+				spriteRenderer.flipX = target.transform.position.x < obj.transform.position.x;
+			}
+
+			if (action == "SET_DIRECTION_POS")
+			{
+				float target = float.Parse(args[0]);
+
+				SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
+				spriteRenderer.flipX = target < obj.transform.position.x;
+			}
+
+			if (action == "MOTION_RESET")
+			{
+				GameObject.Destroy(obj.GetComponent<Mover>());
+			}
+
+			if (action == "MOTION_LINEAR_TARGET")
+			{
+				GameObject target = Objects[args[0]];
+				float speed = float.Parse(args[1]);
+
+				Mover mover = GetOrAddComponent<Mover>(obj);
+				mover.InitiateTargetMotion(obj.transform.position.x, target, speed, Mover.TrajectoryTypeE.Linear);
+			}
+
+			if (action == "MOTION_LINEAR_POS")
+			{
+				float pos = float.Parse(args[0]);
+				float speed = float.Parse(args[1]);
+
+				Mover mover = GetOrAddComponent<Mover>(obj);
+				mover.InitiatePosMotion(obj.transform.position.x, pos, speed, Mover.TrajectoryTypeE.Linear);
+			}
+
+			if (action == "MOTION_PARABOLIC_TARGET")
+			{
+				GameObject target = Objects[args[0]];
+				float speed = float.Parse(args[1]);
+
+				Mover mover = GetOrAddComponent<Mover>(obj);
+				mover.InitiateTargetMotion(obj.transform.position.x, target, speed, Mover.TrajectoryTypeE.Parabolic);
+			}
+
+			if (action == "MOTION_PARABOLIC_POS")
+			{
+				float pos = float.Parse(args[0]);
+				float speed = float.Parse(args[1]);
+
+				Mover mover = GetOrAddComponent<Mover>(obj);
+				mover.InitiatePosMotion(obj.transform.position.x, pos, speed, Mover.TrajectoryTypeE.Parabolic);
+			}
+
+//			if (action == "ANIMATION_SPAWN")        // Todo ?
+//			{
+//
+//			}
+
+			if (action == "ANIMATION_IDLE")
+			{
+				SetAnimation(obj, "Idle");
+			}
+
+			if (action == "ANIMATION_WALK")
+			{
+				SetAnimation(obj, "Walk");
+			}
+
+			if (action == "ANIMATION_ATTACK")
+			{
+				SetAnimation(obj, "Attack");
+			}
+
+			if (action == "ANIMATION_DIE")
+			{
+				SetAnimation(obj, "Die");
+			}
+		}
+
+		GloablTime += Time.deltaTime;
+	}
+
 }

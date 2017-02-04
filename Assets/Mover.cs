@@ -4,39 +4,83 @@ using System.IO;
 
 public class Mover : MonoBehaviour {
 
-    public float Speed;
-    public GameObject Target;
-    public float PosTarget;
-    public bool PosTargetEnable = false;
+	public enum TargetTypeE
+	{
+		Object,
+		Position
+	}
 
-	// Use this for initialization
+	public enum TrajectoryTypeE
+	{
+		Linear,
+		Parabolic
+	}
+		
+    public float Speed;
+	public float StartPos;
+
+    public GameObject ObjectTarget;
+    public float PositionTarget;
+
+	public TargetTypeE TargetType;
+	public TrajectoryTypeE TrajectoryType;
+
 	void Start () {
 
     }
+
+	public void InitiateTargetMotion(float startPos, GameObject target, float speed, TrajectoryTypeE trajectory)
+	{
+		StartPos = startPos;
+		ObjectTarget = target;
+		Speed = speed;
+		TrajectoryType = trajectory;
+
+		TargetType = TargetTypeE.Object;
+	}
+
+	public void InitiatePosMotion(float startPos, float target, float speed, TrajectoryTypeE trajectory)
+	{
+		StartPos = startPos;
+		PositionTarget = target;
+		Speed = speed;
+		TrajectoryType = trajectory;
+
+		TargetType = TargetTypeE.Position;
+	}
 	
-	// Update is called once per frame
 	void Update () {
-        if (!PosTargetEnable && Target == null)
+		Vector3 pos = transform.position;
+		float targetPos = 0;
+
+		switch (TargetType)
+		{
+			case TargetTypeE.Object:
+				targetPos = ObjectTarget.transform.position.x;
+				break;
+			case TargetTypeE.Position:
+				targetPos = PositionTarget;
+				break;
+		}
+
+
+		float deltaPos = targetPos - transform.position.x;
+
+        if (deltaPos == 0)
         {
             return;
         }
-        else
-        {
-            Vector3 newPosition = transform.position;
-            float targetPos = PosTargetEnable ? PosTarget : Target.transform.position.x;
 
-            float d = targetPos - transform.position.x;
+		if (TrajectoryType == TrajectoryTypeE.Parabolic)
+		{
+			float flightPeak = (StartPos + targetPos) / 2;
+			float flightLength = Mathf.Abs(StartPos - targetPos);
+			float maxHeight = Mathf.Sqrt(flightLength) / 3;
+			pos.y = - (Mathf.Pow((pos.x - flightPeak) / flightLength * 2, 2) - 1) * maxHeight;
+		}
 
-            if (d == 0)
-            {
-                return;
-            }
+		pos.x = pos.x + deltaPos / Mathf.Abs(deltaPos) * Speed * Time.deltaTime;
 
-            newPosition.x = newPosition.x + d / Mathf.Abs(d) * Speed * Time.deltaTime;
-
-            transform.position = newPosition;
-
-//            transform.Translate((Target.transform.position - transform.position).normalized * Speed * Time.deltaTime);
-        }
+        transform.position = pos;
 	}
 }
