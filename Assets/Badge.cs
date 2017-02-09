@@ -3,12 +3,6 @@ using System.Collections;
 
 public class Badge : MonoBehaviour {
 
-    public enum Player
-    {
-        Left,
-        Right
-    }
-
     public string Name;
     public Player Owner;
 

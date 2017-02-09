@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ public class MainController : MonoBehaviour
 		yield return new WaitForSeconds(time);
 		GameObject.Destroy(target);
 	}
-
+		
 	private T GetOrAddComponent<T>(GameObject obj) where T : Component
 	{
 		T component = obj.GetComponent<T>();
@@ -63,7 +64,7 @@ public class MainController : MonoBehaviour
 			if (action == "CREATE")
 			{
 				string name = args[0];
-				Badge.Player owner = (Badge.Player)Enum.Parse(typeof(Badge.Player), args[1]);
+				Player owner = (Player)Enum.Parse(typeof(Player), args[1]);
 
 				GameObject tmp = (GameObject)Instantiate(Resources.Load(name));
 				Objects.Add(id, tmp);
@@ -73,8 +74,13 @@ public class MainController : MonoBehaviour
 				crystal.Name = name;
 				crystal.Owner = owner;
 			}
+				
+			GameObject obj;
 
-			GameObject obj = Objects[id];
+			if (action != "CARDS_UPDATE" && action != "MANA_UPDATE")
+			{
+				obj = Objects[id];
+			}
 
 			if (action == "DESTROY")
 			{
@@ -165,10 +171,11 @@ public class MainController : MonoBehaviour
 				mover.InitiatePosMotion(obj.transform.position.x, pos, speed, Mover.TrajectoryTypeE.Parabolic);
 			}
 
-//			if (action == "ANIMATION_SPAWN")        // Todo ?
-//			{
-//
-//			}
+			if (action == "ANIMATION_SPAWN")
+			{
+				SetAnimation(obj, "Idle");
+				obj.AddComponent<Spawn>();
+			}
 
 			if (action == "ANIMATION_IDLE")
 			{
@@ -188,6 +195,20 @@ public class MainController : MonoBehaviour
 			if (action == "ANIMATION_DIE")
 			{
 				SetAnimation(obj, "Die");
+			}
+
+			if (action == "CARDS_UPDATE")
+			{
+				Player player = (Player)Enum.Parse(typeof(Player), id);
+				GameObject.Find(player.ToString() + "Controller")
+					.GetComponent<PlayerController>().SetCards(args);
+			}
+
+			if (action == "MANA_UPDATE")
+			{
+				Player player = (Player)Enum.Parse(typeof(Player), id);
+				GameObject.Find(player.ToString() + "Controller")
+					.GetComponent<PlayerController>().SetMana(float.Parse(args[0]));
 			}
 		}
 
