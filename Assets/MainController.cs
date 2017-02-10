@@ -69,10 +69,12 @@ public class MainController : MonoBehaviour
 				GameObject tmp = (GameObject)Instantiate(Resources.Load(name));
 				Objects.Add(id, tmp);
 
-				Badge crystal = GetOrAddComponent<Badge>(tmp);
+				Badge badge = GetOrAddComponent<Badge>(tmp);
 
-				crystal.Name = name;
-				crystal.Owner = owner;
+				badge.Name = name;
+				badge.Owner = owner;
+
+				tmp.transform.localScale = tmp.transform.localScale * 2;
 			}
 				
 			GameObject obj;
@@ -141,7 +143,7 @@ public class MainController : MonoBehaviour
 				float speed = float.Parse(args[1]);
 
 				Mover mover = GetOrAddComponent<Mover>(obj);
-				mover.InitiateTargetMotion(obj.transform.position.x, target, speed, Mover.TrajectoryTypeE.Linear);
+				mover.InitiateTargetMotion(obj.transform.position, target, speed, Mover.TrajectoryTypeE.Linear);
 			}
 
 			if (action == "MOTION_LINEAR_POS")
@@ -150,7 +152,7 @@ public class MainController : MonoBehaviour
 				float speed = float.Parse(args[1]);
 
 				Mover mover = GetOrAddComponent<Mover>(obj);
-				mover.InitiatePosMotion(obj.transform.position.x, pos, speed, Mover.TrajectoryTypeE.Linear);
+				mover.InitiatePosMotion(obj.transform.position, pos, speed, Mover.TrajectoryTypeE.Linear);
 			}
 
 			if (action == "MOTION_PARABOLIC_TARGET")
@@ -159,7 +161,7 @@ public class MainController : MonoBehaviour
 				float speed = float.Parse(args[1]);
 
 				Mover mover = GetOrAddComponent<Mover>(obj);
-				mover.InitiateTargetMotion(obj.transform.position.x, target, speed, Mover.TrajectoryTypeE.Parabolic);
+				mover.InitiateTargetMotion(obj.transform.position, target, speed, Mover.TrajectoryTypeE.Parabolic);
 			}
 
 			if (action == "MOTION_PARABOLIC_POS")
@@ -168,12 +170,16 @@ public class MainController : MonoBehaviour
 				float speed = float.Parse(args[1]);
 
 				Mover mover = GetOrAddComponent<Mover>(obj);
-				mover.InitiatePosMotion(obj.transform.position.x, pos, speed, Mover.TrajectoryTypeE.Parabolic);
+				mover.InitiatePosMotion(obj.transform.position, pos, speed, Mover.TrajectoryTypeE.Parabolic);
 			}
 
 			if (action == "ANIMATION_SPAWN")
 			{
 				SetAnimation(obj, "Idle");
+
+				float r = UnityEngine.Random.Range(-0.5f, 0.5f);
+				obj.transform.Translate(new Vector3(0, r,  -5 + r));
+
 				obj.AddComponent<Spawn>();
 			}
 

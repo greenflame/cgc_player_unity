@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class Health : MonoBehaviour {
@@ -6,13 +7,9 @@ public class Health : MonoBehaviour {
     public int MaxHealth;
     public int CurrentHealth;
 
-    private float labelDelta;
-
 	// Use this for initialization
 	void Start () {
         CurrentHealth = MaxHealth;
-        Random.seed += 1;
-        labelDelta = Random.Range(1, 3);
 	}
 	
 	// Update is called once per frame
@@ -20,14 +17,61 @@ public class Health : MonoBehaviour {
 	
 	}
 
+	GUIStyle MakeStyle(Color color)
+	{
+		Texture2D t = new Texture2D(1, 1);
+		t.SetPixel(0, 0, color);
+		t.Apply();
+
+		GUIStyle s = new GUIStyle();
+		s.normal.background = t;
+
+		return s;
+	}
+
     void OnGUI() {
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position + Vector3.up * labelDelta);
-        screenPos.y = Screen.height - screenPos.y;
+		
+		if (CurrentHealth == 0)
+		{
+			return;
+		}
 
-        GUIStyle style = new GUIStyle();
-        style.normal.textColor = Color.black;
+		float pos = 2f;
+		float width = 1;
+		float height = 0.1f;
 
-        string message = string.Format("{0}/{1}", CurrentHealth, MaxHealth);
-        GUI.Label( new Rect(screenPos.x, screenPos.y + 15, 200f, 100f) , message, style);
-    }
+		if (GetComponent<Badge>().Name == "Forge")
+		{
+			pos = 3.5f;
+			width = 1.5f;
+		}
+
+		if (GetComponent<Badge>().Name == "Tower")
+		{
+			pos = 2.5f;
+			width = 1.5f;
+		}
+
+		Vector3 mid = transform.position + Vector3.up * pos;
+
+		Vector3 r = Vector3.right * width / 2;
+		Vector3 u = Vector3.up * height / 2;
+
+		Vector3 lu = Camera.main.WorldToScreenPoint(mid - r + u);
+		Vector3 rd = Camera.main.WorldToScreenPoint(mid + r - u);
+
+		GUI.Box(new Rect(
+			lu.x,
+			Screen.height - lu.y,
+			rd.x - lu.x,
+			lu.y - rd.y
+		), "", MakeStyle(Color.gray));
+
+		GUI.Box(new Rect(
+			lu.x,
+			Screen.height - lu.y,
+			(rd.x - lu.x) * CurrentHealth / MaxHealth,
+			lu.y - rd.y
+		), "", MakeStyle(new Color(0.77f, 0.18f, 0.05f)));
+	}
 }

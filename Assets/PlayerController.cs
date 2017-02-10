@@ -34,9 +34,15 @@ public class PlayerController : MonoBehaviour {
 
 			string curImageName = "card_" + i.ToString();
 
-			Image image = transform.Find(curImageName).GetComponent<Image>();
+			GameObject imageObj = transform.Find(curImageName).gameObject;
+			Image image = imageObj.GetComponent<Image>();
 			Sprite[] sprites = Resources.LoadAll<Sprite>(string.Format("{0}/{1}", curTroopName, curTroopName));
-			image.sprite = sprites.Single(s => s.name == "i0");
+			Sprite sprite = sprites.Single(s => s.name == "i0");
+			image.sprite = sprite;
+
+			Vector3 scale = imageObj.GetComponent<RectTransform>().localScale;
+			scale.x = sprite.rect.width / sprite.rect.height;
+			imageObj.GetComponent<RectTransform>().localScale = scale;
 		}
 	}
 

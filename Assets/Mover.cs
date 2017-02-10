@@ -17,7 +17,7 @@ public class Mover : MonoBehaviour {
 	}
 		
     public float Speed;
-	public float StartPos;
+	public Vector3 StartPos;
 
     public GameObject ObjectTarget;
     public float PositionTarget;
@@ -29,7 +29,7 @@ public class Mover : MonoBehaviour {
 
     }
 
-	public void InitiateTargetMotion(float startPos, GameObject target, float speed, TrajectoryTypeE trajectory)
+	public void InitiateTargetMotion(Vector3 startPos, GameObject target, float speed, TrajectoryTypeE trajectory)
 	{
 		StartPos = startPos;
 		ObjectTarget = target;
@@ -39,7 +39,7 @@ public class Mover : MonoBehaviour {
 		TargetType = TargetTypeE.Object;
 	}
 
-	public void InitiatePosMotion(float startPos, float target, float speed, TrajectoryTypeE trajectory)
+	public void InitiatePosMotion(Vector3 startPos, float target, float speed, TrajectoryTypeE trajectory)
 	{
 		StartPos = startPos;
 		PositionTarget = target;
@@ -73,10 +73,10 @@ public class Mover : MonoBehaviour {
 
 		if (TrajectoryType == TrajectoryTypeE.Parabolic)
 		{
-			float flightPeak = (StartPos + targetPos) / 2;
-			float flightLength = Mathf.Abs(StartPos - targetPos);
+			float flightPeak = (StartPos.x + targetPos) / 2;
+			float flightLength = Mathf.Abs(StartPos.x - targetPos);
 			float maxHeight = Mathf.Sqrt(flightLength) / 3;
-			pos.y = - (Mathf.Pow((pos.x - flightPeak) / flightLength * 2, 2) - 1) * maxHeight;
+			pos.y = StartPos.y - (Mathf.Pow((pos.x - flightPeak) / flightLength * 2, 2) - 1) * maxHeight;
 		}
 
 		pos.x = pos.x + deltaPos / Mathf.Abs(deltaPos) * Speed * Time.deltaTime;
