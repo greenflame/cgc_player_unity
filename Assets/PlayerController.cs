@@ -6,10 +6,15 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
 
+	public bool Enabled = true;
+
 	public float CurrentMana = 0;
 
 	public const float ManaProductionSpeed = 1f / 2.8f;
 	public const float MaxMana = 8;
+
+	public string AiName = "";
+	private string Verdict = "";
 
 	private RectTransform ManaBar;
 	private Text ManaText;
@@ -19,6 +24,11 @@ public class PlayerController : MonoBehaviour {
 		ManaText = transform.Find("mana_text").GetComponent<Text>();
 	}
 
+	private void UpdateStrategyLabel()
+	{
+		transform.Find("strategy").GetComponent<Text>().text = string.Format("{0} [{1}]", AiName, Verdict);
+	}
+
 	public void SetMana(float mana)
 	{
 		CurrentMana = mana;
@@ -26,7 +36,14 @@ public class PlayerController : MonoBehaviour {
 
 	public void SetName(string name)
 	{
-		transform.Find("strategy").GetComponent<Text>().text = name;
+		AiName = name;
+		UpdateStrategyLabel();
+	}
+
+	public void SetVerdict(string verdict)
+	{
+		Verdict = verdict;
+		UpdateStrategyLabel();
 	}
 
 	public void SetCards(string[] cards)
@@ -55,6 +72,11 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void Update () {
+		if (!Enabled)
+		{
+			return;
+		}
+
 		CurrentMana = Mathf.Min(MaxMana, CurrentMana + ManaProductionSpeed * Time.deltaTime);
 
 		Vector3 scale =  ManaBar.localScale;

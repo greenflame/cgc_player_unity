@@ -8,16 +8,47 @@ using System;
 
 public class MainController : MonoBehaviour
 {
+	private bool Enabled = true;
 
-	private float GloablTime;   // Todo
+	private float GloablTime;
 	private Dictionary<string, GameObject> Objects;
 	private CommandController CommandController;
+
+	private Text TimeText;
+	private MessageRepresentor MessageRepresentor;
+
+	private float VsMessageTime = 5;
+
+	private PlayerController LeftController;
+	private PlayerController RightController;
 
 	void Start()
 	{
 		Objects = new Dictionary<string, GameObject>();
 		GloablTime = 0;
 		CommandController = new CommandController("/Users/alexander/cgc_compiler/cgc_compiler/bin/Debug/game_log.txt");
+
+		TimeText = GameObject.Find("WorldTime").GetComponent<Text>();
+		MessageRepresentor = GetComponent<MessageRepresentor>();
+
+		LeftController = GameObject.Find("LeftController").GetComponent<PlayerController>();
+		RightController = GameObject.Find("RightController").GetComponent<PlayerController>();
+	}
+
+	private IEnumerator VsCoro()
+	{
+		Enabled = false;
+		LeftController.Enabled = false;
+		RightController.Enabled = false;
+
+		MessageRepresentor.showMessage(string.Format("{0}   vs   {1}",
+			LeftController.AiName, RightController.AiName), 100);
+		yield return new WaitForSeconds(VsMessageTime);
+		MessageRepresentor.hideMessage();
+
+		Enabled = true;
+		LeftController.Enabled = true;
+		RightController.Enabled = true;
 	}
 
 	private IEnumerator DeleteCoro(GameObject target, float time)
@@ -46,6 +77,11 @@ public class MainController : MonoBehaviour
 		
 	void Update()
 	{
+		if (!Enabled)
+		{
+			return;
+		}
+
 		while (!CommandController.IsEnd() && float.Parse(CommandController.Top()[1]) < GloablTime)
 		{
 			string[] args = CommandController.Pop();
@@ -76,6 +112,55 @@ public class MainController : MonoBehaviour
 				Player player = (Player)Enum.Parse(typeof(Player), id);
 				GameObject.Find(player.ToString() + "Controller")
 					.GetComponent<PlayerController>().SetName(args[0]);
+
+				if (!string.IsNullOrEmpty(LeftController.AiName) && !string.IsNullOrEmpty(RightController.AiName))
+				{
+					StartCoroutine(VsCoro());
+				}
+
+				return;
+			}
+
+			if (action == "VERDICT_UPDATE")
+			{
+				Player player = (Player)Enum.Parse(typeof(Player), id);
+				GameObject.Find(player.ToString() + "Controller")
+					.GetComponent<PlayerController>().SetVerdict(args[0]);
+				return;
+			}
+
+			if (action == "GAME_END")
+			{
+				// Freeze all objects
+				Objects.Values.ToList().ForEach(o => {
+					try
+					{
+						GameObject.Destroy(o.GetComponent<Mover>());
+					}
+					catch
+					{
+					}
+					try
+					{
+						SetAnimation(o, "Idle");
+					}
+					catch
+					{
+					}
+				});
+
+				LeftController.Enabled = false;
+				RightController.Enabled = false;
+
+				// Show message
+				Player player = (Player)Enum.Parse(typeof(Player), id);
+				string name = GameObject.Find(player.ToString() + "Controller")
+					.GetComponent<PlayerController>().AiName;
+				MessageRepresentor.showMessage(name + " wоn!", 100);
+
+				// Disable controller
+				Enabled = false;
+
 				return;
 			}
 
@@ -219,6 +304,7 @@ public class MainController : MonoBehaviour
 		}
 
 		GloablTime += Time.deltaTime;
+		TimeText.text = string.Format("World time:\n{0}.0", (int)Mathf.Floor(GloablTime));
 	}
 
 }
