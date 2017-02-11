@@ -10,14 +10,14 @@ public class MainController : MonoBehaviour
 {
 	private bool Enabled = true;
 
-	private float GloablTime;
+	public float GloablTime;
 	private Dictionary<string, GameObject> Objects;
 	private CommandController CommandController;
 
 	private Text TimeText;
 	private MessageRepresentor MessageRepresentor;
 
-	private float VsMessageTime = 5;
+	private float VsMessageTime = 3;
 
 	private PlayerController LeftController;
 	private PlayerController RightController;
@@ -81,6 +81,8 @@ public class MainController : MonoBehaviour
 		{
 			return;
 		}
+
+		GloablTime += Time.deltaTime;
 
 		while (!CommandController.IsEnd() && float.Parse(CommandController.Top()[1]) < GloablTime)
 		{
@@ -148,18 +150,18 @@ public class MainController : MonoBehaviour
 					{
 					}
 				});
-
-				LeftController.Enabled = false;
-				RightController.Enabled = false;
-
+					
 				// Show message
 				Player player = (Player)Enum.Parse(typeof(Player), id);
 				string name = GameObject.Find(player.ToString() + "Controller")
 					.GetComponent<PlayerController>().AiName;
 				MessageRepresentor.showMessage(name + " wоn!", 100);
 
-				// Disable controller
+				// Disable controllers
 				Enabled = false;
+				LeftController.Enabled = false;
+				RightController.Enabled = false;
+
 
 				return;
 			}
@@ -303,8 +305,6 @@ public class MainController : MonoBehaviour
 			}
 		}
 
-		GloablTime += Time.deltaTime;
-		TimeText.text = string.Format("World time:\n{0}.0", (int)Mathf.Floor(GloablTime));
+		TimeText.text = string.Format("World time:\n{0}.0\nSpeed:\n{1:F1}x", (int)Mathf.Floor(GloablTime), Time.timeScale);
 	}
-
 }
