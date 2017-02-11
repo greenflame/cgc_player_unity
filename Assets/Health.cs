@@ -7,12 +7,20 @@ public class Health : MonoBehaviour {
     public int MaxHealth;
     public int CurrentHealth;
 
-	// Use this for initialization
+	private GUIStyle BackStyle;
+	private GUIStyle HealthStyle;
+
+	private Badge Badge;
+
 	void Start () {
         CurrentHealth = MaxHealth;
+
+		BackStyle = MakeStyle(Color.gray);
+		HealthStyle = MakeStyle(new Color(0.77f, 0.18f, 0.05f));
+
+		Badge = GetComponent<Badge>();
 	}
 	
-	// Update is called once per frame
 	void Update () {
 	
 	}
@@ -40,13 +48,12 @@ public class Health : MonoBehaviour {
 		float width = 1;
 		float height = 0.1f;
 
-		if (GetComponent<Badge>().Name == "Forge")
+		if (Badge.Name == "Forge")
 		{
 			pos = 3.5f;
 			width = 1.5f;
 		}
-
-		if (GetComponent<Badge>().Name == "Tower")
+		else if (Badge.Name == "Tower")
 		{
 			pos = 2.5f;
 			width = 1.5f;
@@ -65,13 +72,13 @@ public class Health : MonoBehaviour {
 			Screen.height - lu.y,
 			rd.x - lu.x,
 			lu.y - rd.y
-		), "", MakeStyle(Color.gray));
+		), "", BackStyle);
 
 		GUI.Box(new Rect(
 			lu.x,
 			Screen.height - lu.y,
 			(rd.x - lu.x) * CurrentHealth / MaxHealth,
 			lu.y - rd.y
-		), "", MakeStyle(new Color(0.77f, 0.18f, 0.05f)));
+		), "", HealthStyle);
 	}
 }

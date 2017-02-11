@@ -9,19 +9,15 @@ using System;
 public class MainController : MonoBehaviour
 {
 
-	public float GloablTime;
-	private string[] Commands;
-	private int Pointer;
-
+	private float GloablTime;   // Todo
 	private Dictionary<string, GameObject> Objects;
+	private CommandController CommandController;
 
 	void Start()
 	{
 		Objects = new Dictionary<string, GameObject>();
-
-		Commands = File.ReadAllLines("/Users/alexander/cgc_compiler/cgc_compiler/bin/Debug/game_log.txt");
-		Pointer = 0;
 		GloablTime = 0;
+		CommandController = new CommandController("/Users/alexander/cgc_compiler/cgc_compiler/bin/Debug/game_log.txt");
 	}
 
 	private IEnumerator DeleteCoro(GameObject target, float time)
@@ -50,16 +46,38 @@ public class MainController : MonoBehaviour
 		
 	void Update()
 	{
-		while (Pointer < Commands.Length && float.Parse(Commands[Pointer].Split(' ')[1]) < GloablTime)
+		while (!CommandController.IsEnd() && float.Parse(CommandController.Top()[1]) < GloablTime)
 		{
-			string[] args = Commands[Pointer].Split(' ');
-			Debug.Log(Commands[Pointer]);
-			Pointer++;
+			string[] args = CommandController.Pop();
 
 			string action = args[0];
 			string id = args[2];
 
 			args = args.Skip(3).ToArray();
+
+			if (action == "CARDS_UPDATE")
+			{
+				Player player = (Player)Enum.Parse(typeof(Player), id);
+				GameObject.Find(player.ToString() + "Controller")
+					.GetComponent<PlayerController>().SetCards(args);
+				return;
+			}
+
+			if (action == "MANA_UPDATE")
+			{
+				Player player = (Player)Enum.Parse(typeof(Player), id);
+				GameObject.Find(player.ToString() + "Controller")
+					.GetComponent<PlayerController>().SetMana(float.Parse(args[0]));
+				return;
+			}
+
+			if (action == "NAME_UPDATE")
+			{
+				Player player = (Player)Enum.Parse(typeof(Player), id);
+				GameObject.Find(player.ToString() + "Controller")
+					.GetComponent<PlayerController>().SetName(args[0]);
+				return;
+			}
 
 			if (action == "CREATE")
 			{
@@ -77,12 +95,8 @@ public class MainController : MonoBehaviour
 				tmp.transform.localScale = tmp.transform.localScale * 2;
 			}
 				
-			GameObject obj;
+			GameObject obj = Objects[id];
 
-			if (action != "CARDS_UPDATE" && action != "MANA_UPDATE")
-			{
-				obj = Objects[id];
-			}
 
 			if (action == "DESTROY")
 			{
@@ -201,20 +215,6 @@ public class MainController : MonoBehaviour
 			if (action == "ANIMATION_DIE")
 			{
 				SetAnimation(obj, "Die");
-			}
-
-			if (action == "CARDS_UPDATE")
-			{
-				Player player = (Player)Enum.Parse(typeof(Player), id);
-				GameObject.Find(player.ToString() + "Controller")
-					.GetComponent<PlayerController>().SetCards(args);
-			}
-
-			if (action == "MANA_UPDATE")
-			{
-				Player player = (Player)Enum.Parse(typeof(Player), id);
-				GameObject.Find(player.ToString() + "Controller")
-					.GetComponent<PlayerController>().SetMana(float.Parse(args[0]));
 			}
 		}
 

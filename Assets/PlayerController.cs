@@ -11,14 +11,22 @@ public class PlayerController : MonoBehaviour {
 	public const float ManaProductionSpeed = 1f / 2.8f;
 	public const float MaxMana = 8;
 
-	// Use this for initialization
-	void Start () {
+	private RectTransform ManaBar;
+	private Text ManaText;
 
+	void Start () {
+		ManaBar = transform.Find("mana_front").GetComponent<RectTransform>();
+		ManaText = transform.Find("mana_text").GetComponent<Text>();
 	}
 
 	public void SetMana(float mana)
 	{
 		CurrentMana = mana;
+	}
+
+	public void SetName(string name)
+	{
+		transform.Find("strategy").GetComponent<Text>().text = name;
 	}
 
 	public void SetCards(string[] cards)
@@ -46,15 +54,13 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	// Update is called once per frame
 	void Update () {
 		CurrentMana = Mathf.Min(MaxMana, CurrentMana + ManaProductionSpeed * Time.deltaTime);
 
-		RectTransform manaBar = transform.Find("mana_front").GetComponent<RectTransform>();
-		Vector3 scale =  manaBar.localScale;
+		Vector3 scale =  ManaBar.localScale;
 		scale.x = 1f / MaxMana * CurrentMana;
-		manaBar.localScale = scale;
+		ManaBar.localScale = scale;
 
-		transform.Find("mana_text").GetComponent<Text>().text = string.Format("{0} / {1}", (int)Mathf.Floor(CurrentMana), (int)MaxMana);
+		ManaText.text = string.Format("{0} / {1}", (int)Mathf.Floor(CurrentMana), (int)MaxMana);
 	}
 }

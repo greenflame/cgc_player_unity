@@ -9,13 +9,11 @@ public class Spawn : MonoBehaviour {
 
 	private float TimeRest;
 
-	// Use this for initialization
 	void Start () {
 		TimeRest = TotalTime;
 		transform.Translate(Vector3.up * Height);
 	}
 	
-	// Update is called once per frame
 	void Update () {
 		if (TimeRest > 0)
 		{
