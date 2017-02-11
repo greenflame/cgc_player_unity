@@ -26,7 +26,7 @@ public class MainController : MonoBehaviour
 	{
 		Objects = new Dictionary<string, GameObject>();
 		GloablTime = 0;
-		CommandController = new CommandController("/Users/alexander/cgc_compiler/cgc_compiler/bin/Debug/game_log.txt");
+		CommandController = new CommandController("game_log.txt");
 
 		TimeText = GameObject.Find("WorldTime").GetComponent<Text>();
 		MessageRepresentor = GetComponent<MessageRepresentor>();
