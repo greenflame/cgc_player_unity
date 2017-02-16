@@ -6,11 +6,11 @@ public class SpeedController : MonoBehaviour
 {
 	public float Step = 0.5f;
 	public float Min = 0.5f;
-	public float Max = 5;
+	public float Max = 10f;
 
 	void Start()
 	{
-		
+
 	}
 
 	void Update()

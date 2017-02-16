@@ -17,8 +17,6 @@ public class MainController : MonoBehaviour
 	private Text TimeText;
 	private MessageRepresentor MessageRepresentor;
 
-	private float VsMessageTime = 3;
-
 	private PlayerController LeftController;
 	private PlayerController RightController;
 
@@ -26,29 +24,29 @@ public class MainController : MonoBehaviour
 	{
 		Objects = new Dictionary<string, GameObject>();
 		GloablTime = 0;
-		CommandController = new CommandController("game_log.txt");
 
 		TimeText = GameObject.Find("WorldTime").GetComponent<Text>();
 		MessageRepresentor = GetComponent<MessageRepresentor>();
 
 		LeftController = GameObject.Find("LeftController").GetComponent<PlayerController>();
 		RightController = GameObject.Find("RightController").GetComponent<PlayerController>();
+
+		try {
+			CommandController = new CommandController("/Users/alexander/ai_test/ai_test/bin/Debug/game_log.txt");
+		} catch {
+			StartCoroutine(MessageCoro(float.MaxValue, "Cann't find game_log.txt"));
+		}
 	}
 
-	private IEnumerator VsCoro()
+	private IEnumerator MessageCoro(float time, string message)
 	{
-		Enabled = false;
-		LeftController.Enabled = false;
-		RightController.Enabled = false;
+		SetControllersEnabled(false);
 
-		MessageRepresentor.showMessage(string.Format("{0}   vs   {1}",
-			LeftController.AiName, RightController.AiName), 100);
-		yield return new WaitForSeconds(VsMessageTime);
+		MessageRepresentor.showMessage(message, float.MaxValue);
+		yield return new WaitForSeconds(time);
 		MessageRepresentor.hideMessage();
 
-		Enabled = true;
-		LeftController.Enabled = true;
-		RightController.Enabled = true;
+		SetControllersEnabled(true);
 	}
 
 	private IEnumerator DeleteCoro(GameObject target, float time)
@@ -74,6 +72,13 @@ public class MainController : MonoBehaviour
 		string animationFullName = obj.GetComponent<Badge>().Name + animationName;
 		obj.GetComponent<Animator>().Play(animationFullName, 0, 0);
 	}
+
+	private void SetControllersEnabled(bool enabled)
+	{
+		Enabled = enabled;
+		LeftController.Enabled = enabled;
+		RightController.Enabled = enabled;
+	}
 		
 	void Update()
 	{
@@ -98,7 +103,7 @@ public class MainController : MonoBehaviour
 				Player player = (Player)Enum.Parse(typeof(Player), id);
 				GameObject.Find(player.ToString() + "Controller")
 					.GetComponent<PlayerController>().SetCards(args);
-				return;
+				continue;
 			}
 
 			if (action == "MANA_UPDATE")
@@ -106,7 +111,7 @@ public class MainController : MonoBehaviour
 				Player player = (Player)Enum.Parse(typeof(Player), id);
 				GameObject.Find(player.ToString() + "Controller")
 					.GetComponent<PlayerController>().SetMana(float.Parse(args[0]));
-				return;
+				continue;
 			}
 
 			if (action == "NAME_UPDATE")
@@ -114,13 +119,7 @@ public class MainController : MonoBehaviour
 				Player player = (Player)Enum.Parse(typeof(Player), id);
 				GameObject.Find(player.ToString() + "Controller")
 					.GetComponent<PlayerController>().SetName(args[0]);
-
-				if (!string.IsNullOrEmpty(LeftController.AiName) && !string.IsNullOrEmpty(RightController.AiName))
-				{
-					StartCoroutine(VsCoro());
-				}
-
-				return;
+				continue;
 			}
 
 			if (action == "VERDICT_UPDATE")
@@ -128,42 +127,16 @@ public class MainController : MonoBehaviour
 				Player player = (Player)Enum.Parse(typeof(Player), id);
 				GameObject.Find(player.ToString() + "Controller")
 					.GetComponent<PlayerController>().SetVerdict(args[0]);
-				return;
+				continue;
 			}
 
-			if (action == "GAME_END")
+			if (action == "FREEZE_MESSAGE")
 			{
-				// Freeze all objects
-				Objects.Values.ToList().ForEach(o => {
-					try
-					{
-						GameObject.Destroy(o.GetComponent<Mover>());
-					}
-					catch
-					{
-					}
-					try
-					{
-						SetAnimation(o, "Idle");
-					}
-					catch
-					{
-					}
-				});
-					
-				// Show message
-				Player player = (Player)Enum.Parse(typeof(Player), id);
-				string name = GameObject.Find(player.ToString() + "Controller")
-					.GetComponent<PlayerController>().AiName;
-				MessageRepresentor.showMessage(name + " wоn!", 100);
+				float time = float.Parse(id);
+				string message = string.Join(" ", args);
 
-				// Disable controllers
-				Enabled = false;
-				LeftController.Enabled = false;
-				RightController.Enabled = false;
-
-
-				return;
+				StartCoroutine(MessageCoro(time, message));
+				continue;
 			}
 
 			if (action == "CREATE")
@@ -180,6 +153,7 @@ public class MainController : MonoBehaviour
 				badge.Owner = owner;
 
 				tmp.transform.localScale = tmp.transform.localScale * 2;
+				continue;
 			}
 				
 			GameObject obj = Objects[id];
@@ -188,6 +162,7 @@ public class MainController : MonoBehaviour
 			if (action == "DESTROY")
 			{
 				StartCoroutine(DeleteCoro(obj, 0));
+				continue;
 			}
 
 			if (action == "DESTROY_DELAYED")
@@ -195,6 +170,7 @@ public class MainController : MonoBehaviour
 				float interval = float.Parse(args[0]);
 
 				StartCoroutine(DeleteCoro(obj, interval));
+				continue;
 			}
 
 			if (action == "SET_HEALTH")
@@ -206,6 +182,7 @@ public class MainController : MonoBehaviour
 
 				health.MaxHealth = maxHealth;
 				health.CurrentHealth = currentHealth;
+				continue;
 			}
 
 			if (action == "SET_POSITION")
@@ -215,6 +192,7 @@ public class MainController : MonoBehaviour
 				Vector3 tmp = obj.transform.position;
 				tmp.x = pos;
 				obj.transform.position = tmp;
+				continue;
 			}
 				
 			if (action == "SET_DIRECTION_TARGET")
@@ -223,6 +201,7 @@ public class MainController : MonoBehaviour
 
 				SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
 				spriteRenderer.flipX = target.transform.position.x < obj.transform.position.x;
+				continue;
 			}
 
 			if (action == "SET_DIRECTION_POS")
@@ -231,11 +210,13 @@ public class MainController : MonoBehaviour
 
 				SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
 				spriteRenderer.flipX = target < obj.transform.position.x;
+				continue;
 			}
 
 			if (action == "MOTION_RESET")
 			{
 				GameObject.Destroy(obj.GetComponent<Mover>());
+				continue;
 			}
 
 			if (action == "MOTION_LINEAR_TARGET")
@@ -245,6 +226,7 @@ public class MainController : MonoBehaviour
 
 				Mover mover = GetOrAddComponent<Mover>(obj);
 				mover.InitiateTargetMotion(obj.transform.position, target, speed, Mover.TrajectoryTypeE.Linear);
+				continue;
 			}
 
 			if (action == "MOTION_LINEAR_POS")
@@ -254,6 +236,7 @@ public class MainController : MonoBehaviour
 
 				Mover mover = GetOrAddComponent<Mover>(obj);
 				mover.InitiatePosMotion(obj.transform.position, pos, speed, Mover.TrajectoryTypeE.Linear);
+				continue;
 			}
 
 			if (action == "MOTION_PARABOLIC_TARGET")
@@ -263,6 +246,7 @@ public class MainController : MonoBehaviour
 
 				Mover mover = GetOrAddComponent<Mover>(obj);
 				mover.InitiateTargetMotion(obj.transform.position, target, speed, Mover.TrajectoryTypeE.Parabolic);
+				continue;
 			}
 
 			if (action == "MOTION_PARABOLIC_POS")
@@ -272,6 +256,7 @@ public class MainController : MonoBehaviour
 
 				Mover mover = GetOrAddComponent<Mover>(obj);
 				mover.InitiatePosMotion(obj.transform.position, pos, speed, Mover.TrajectoryTypeE.Parabolic);
+				continue;
 			}
 
 			if (action == "ANIMATION_SPAWN")
@@ -282,26 +267,31 @@ public class MainController : MonoBehaviour
 				obj.transform.Translate(new Vector3(0, r,  -5 + r));
 
 				obj.AddComponent<Spawn>();
+				continue;
 			}
 
 			if (action == "ANIMATION_IDLE")
 			{
 				SetAnimation(obj, "Idle");
+				continue;
 			}
 
 			if (action == "ANIMATION_WALK")
 			{
 				SetAnimation(obj, "Walk");
+				continue;
 			}
 
 			if (action == "ANIMATION_ATTACK")
 			{
 				SetAnimation(obj, "Attack");
+				continue;
 			}
 
 			if (action == "ANIMATION_DIE")
 			{
 				SetAnimation(obj, "Die");
+				continue;
 			}
 		}
 
