@@ -32,7 +32,7 @@ public class MainController : MonoBehaviour
 		RightController = GameObject.Find("RightController").GetComponent<PlayerController>();
 
 		try {
-			CommandController = new CommandController("/Users/alexander/ai_test/ai_test/bin/Debug/game_log.txt");
+			CommandController = new CommandController("game_log.txt");
 		} catch {
 			StartCoroutine(MessageCoro(float.MaxValue, "Cann't find game_log.txt"));
 		}
