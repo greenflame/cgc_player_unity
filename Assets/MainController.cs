@@ -89,9 +89,9 @@ public class MainController : MonoBehaviour
 
 		GloablTime += Time.deltaTime;
 
-		while (!CommandController.IsEnd() && float.Parse(CommandController.Top()[1]) < GloablTime)
+		while (!CommandController.IsEnd() && CommandController.TopTime() < GloablTime)
 		{
-			string[] args = CommandController.Pop();
+			string[] args = CommandController.PopCommand();
 
 			string action = args[0];
 			string id = args[2];

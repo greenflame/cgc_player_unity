@@ -12,13 +12,24 @@ public class Health : MonoBehaviour {
 
 	private Badge Badge;
 
+	private Color LeftPlayerColor = new Color(0f/255f, 50f/255f, 250f/255f);
+	private Color RightPlayerColor = new Color(200f/255f, 50f/255f, 10f/255f);
+
 	void Start () {
         CurrentHealth = MaxHealth;
 
-		BackStyle = MakeStyle(Color.gray);
-		HealthStyle = MakeStyle(new Color(0.77f, 0.18f, 0.05f));
-
 		Badge = GetComponent<Badge>();
+
+		BackStyle = MakeStyle(Color.gray);
+
+		if (Badge.Owner == Player.Left)
+		{
+			HealthStyle = MakeStyle(LeftPlayerColor);
+		}
+		else
+		{
+			HealthStyle = MakeStyle(RightPlayerColor);
+		}
 	}
 	
 	void Update () {

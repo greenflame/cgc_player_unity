@@ -1,13 +1,15 @@
 ﻿using System;
 using System.IO;
+using System.Globalization;
 
 public class CommandController
 {
 	private string[] Commands;
 	private int Pointer;
 
-	private string[] CachedCommand;
 	private int CachedIndex;
+	private string[] CachedCommand;
+	private float CachedTime;
 
 	public CommandController(string fileName)
 	{
@@ -16,26 +18,34 @@ public class CommandController
 		CachedIndex = -1;
 	}
 
-	private string[] Take(int index)
+	private void UpdateCache(int index)
 	{
 		if (CachedIndex != index)
 		{
 			CachedIndex = index;
 			CachedCommand = Commands[index].Split(' ');
+			CachedTime = float.Parse(CachedCommand[1], CultureInfo.InvariantCulture.NumberFormat);
 		}
+	}
 
+	public string[] TopCommand()
+	{
+		UpdateCache(Pointer);
 		return CachedCommand;
 	}
 
-	public string[] Top()
+	public float TopTime()
 	{
-		return Take(Pointer);
+		UpdateCache(Pointer);
+		return CachedTime;
 	}
 
-	public string[] Pop()
+	public string[] PopCommand()
 	{
+		UpdateCache(Pointer);
+		string[] command = TopCommand();
 		Pointer++;
-		return Take(Pointer - 1);
+		return command;
 	}
 
 	public bool IsEnd()
